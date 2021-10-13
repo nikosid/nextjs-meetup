@@ -22,7 +22,7 @@ const DetailMeetupPage = (props) => {
 
 export async function getStaticPaths() {
   const client = await MongoClient.connect(
-    process.env.MONGO_DSN
+    process.env.MONGO_URL
   );
   const db = client.db();
 
