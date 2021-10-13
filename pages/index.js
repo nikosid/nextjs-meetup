@@ -19,7 +19,7 @@ const MainPage = (props) => {
 export async function getStaticProps() {
   // fetch data from an API
   const client = await MongoClient.connect(
-    'mongodb+srv://nextjsmeetups:rEdHrrOHnLCGZzAd@nextjs-cluster.yuge0.mongodb.net/meetups?retryWrites=true&w=majority'
+    process.env.MONGO_URL
   );
   const db = client.db();
 
