@@ -1,32 +1,44 @@
 import MeetupList from "../components/meetups/MeetupList";
-
-const DUMMY_MEETUPS = [
-  {
-    id: "m1",
-    title: "First meetup",
-    image: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg",
-    address: "Some address 5",
-    description: "This is a first meetup description"
-  },
-  {
-    id: "m2",
-    title: "Second meetup",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png",
-    address: "Some second address",
-    description: "This is a second meetup description"
-  },
-];
+import Head from "next/head";
+import {MongoClient} from "mongodb";
 
 const MainPage = (props) => {
-  return <MeetupList meetups={props.meetups} />
+  return <>
+    <Head>
+      <title>React Meetups</title>
+      <meta
+        name='description'
+        content='Browse a huge list of highly active React meetups!'
+      />
+    </Head>
+    <MeetupList meetups={props.meetups}/>
+  </>
 };
 
 
 export async function getStaticProps() {
+  // fetch data from an API
+  const client = await MongoClient.connect(
+    'mongodb+srv://nextjsmeetups:rEdHrrOHnLCGZzAd@nextjs-cluster.yuge0.mongodb.net/meetups?retryWrites=true&w=majority'
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
+
   return {
     props: {
-      meetups: DUMMY_MEETUPS
-    }
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
+      })),
+    },
+    revalidate: 1,
   };
 }
 
